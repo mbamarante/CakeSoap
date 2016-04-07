@@ -17,7 +17,6 @@ namespace CakeSoap\Network;
 
 use Cake\Core\Configure;
 use Cake\Core\InstanceConfigTrait;
-use Cake\Log\LogTrait;
 use Cake\Network\Request;
 use Cake\Network\Response;
 use CakeSoap\Network\SoapClient;
@@ -30,7 +29,6 @@ class CakeSoap
 {
 
     use InstanceConfigTrait;
-    use LogTrait;
 
     /**
      * SoapClient instance
@@ -81,8 +79,7 @@ class CakeSoap
     protected function _parseConfig()
     {
         if (!class_exists('SoapClient')) {
-            $this->error = 'Class SoapClient not found, please enable Soap extensions';
-            $this->showError();
+            throw new Exception('Class SoapClient not found, please enable Soap extensions');
             return false;
         }
 
@@ -123,8 +120,7 @@ class CakeSoap
         try {
             $this->client = new SoapClient($this->config('wsdl'), $options);
         } catch (SoapFault $fault) {
-            $this->error = $fault->faultstring;
-            $this->showError();
+            throw new SoapFault(null, $fault->faultstring);
         }
         if ($this->client) {
             $this->connected = true;
@@ -163,7 +159,6 @@ class CakeSoap
      */
     public function sendRequest($action, $data)
     {
-        $this->error = false;
         if (!$this->connected) {
             $this->connect();
         }
@@ -171,8 +166,7 @@ class CakeSoap
         try {
             $result = $this->client->__soapCall($action, $data);
         } catch (SoapFault $fault) {
-            $this->error = $fault->faultstring;
-            $this->showError();
+            throw new SoapFault(null, $fault->faultstring);
             return false;
         }
         return $result;
@@ -196,25 +190,5 @@ class CakeSoap
     public function getRequest()
     {
         return $this->client->__getLastRequest();
-    }
-
-    /**
-     * Shows an error message and outputs the SOAP result if passed
-     *
-     * @param string $result A SOAP result
-     * @return void
-     */
-    public function showError($result = null)
-    {
-        $this->log($this->client->__getLastRequest());
-
-        if (Configure::read('debug') === true) {
-            if ($this->error) {
-                trigger_error('<span style="color:Red;text-align:left"><b>SOAP Error:</b> ' . $this->error . '</span>', E_USER_WARNING);
-            }
-            if (!empty($result)) {
-                echo sprintf("<p><b>Result:</b> %s </p>", $result);
-            }
-        }
     }
 }
