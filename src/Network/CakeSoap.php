@@ -164,7 +164,7 @@ class CakeSoap
         }
 
         try {
-            $result = $this->client->__soapCall($action, $data);
+            $result = $this->client->Dispacther($action, $data);
         } catch (SoapFault $fault) {
             throw new SoapFault(null, $fault->faultstring);
             return false;
