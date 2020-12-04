@@ -17,9 +17,11 @@ namespace CakeSoap\Network;
 
 use Cake\Core\Configure;
 use Cake\Core\InstanceConfigTrait;
+use Cake\Log\LogTrait;
 use Cake\Network\Request;
 use Cake\Network\Response;
-use CakeSoap\Network\SoapClient;
+// use CakeSoap\Network\SoapClient;
+use SoapClient;
 use SoapFault;
 
 /**
@@ -29,6 +31,7 @@ class CakeSoap
 {
 
     use InstanceConfigTrait;
+    use LogTrait;
 
     /**
      * SoapClient instance
@@ -67,7 +70,7 @@ class CakeSoap
      */
     public function __construct(array $config = [])
     {
-        $this->config($config);
+        $this->setConfig($config);
         $this->connect();
     }
 
@@ -79,13 +82,14 @@ class CakeSoap
     protected function _parseConfig()
     {
         if (!class_exists('SoapClient')) {
-            throw new Exception('Class SoapClient not found, please enable Soap extensions');
+            $this->error = 'Class SoapClient not found, please enable Soap extensions';
+            $this->showError();
             return false;
         }
 
         $opts = [
             'http' => [
-                'user_agent' => $this->config('userAgent')
+                'user_agent' => $this->getConfig('userAgent')
             ]
         ];
 
@@ -95,16 +99,16 @@ class CakeSoap
             'stream_context' => $context,
             'cache_wsdl' => WSDL_CACHE_NONE
         ];
-        if (!empty($this->config('location'))) {
+        if (!empty($this->getConfig('location'))) {
             $options['location'] = $this->config('location');
         }
-        if (!empty($this->config('uri'))) {
+        if (!empty($this->getConfig('uri'))) {
             $options['uri'] = $this->config('uri');
         }
-        if (!empty($this->config('login'))) {
-            $options['login'] = $this->config('login');
-            $options['password'] = $this->config('password');
-            $options['authentication'] = $this->config('authentication');
+        if (!empty($this->getConfig('login'))) {
+            $options['login'] = $this->getConfig('login');
+            $options['password'] = $this->getConfig('password');
+            $options['authentication'] = $this->getConfig('authentication');
         }
         return $options;
     }
@@ -118,13 +122,15 @@ class CakeSoap
     {
         $options = $this->_parseConfig();
         try {
-            $this->client = new SoapClient($this->config('wsdl'), $options);
+            $this->client = new SoapClient($this->getConfig('wsdl'), $options);
         } catch (SoapFault $fault) {
-            throw new SoapFault(null, $fault->faultstring);
+            $this->error = $fault->faultstring;
+            $this->showError();
         }
         if ($this->client) {
             $this->connected = true;
         }
+
         return $this->connected;
     }
 
@@ -159,6 +165,7 @@ class CakeSoap
      */
     public function sendRequest($action, $data)
     {
+        $this->error = false;
         if (!$this->connected) {
             $this->connect();
         }
@@ -166,7 +173,8 @@ class CakeSoap
         try {
             $result = $this->client->Dispacther($action, $data);
         } catch (SoapFault $fault) {
-            throw new SoapFault(null, $fault->faultstring);
+            $this->error = $fault->faultstring;
+            $this->showError();
             return false;
         }
         return $result;
@@ -190,5 +198,26 @@ class CakeSoap
     public function getRequest()
     {
         return $this->client->__getLastRequest();
+    }
+
+    /**
+     * Shows an error message and outputs the SOAP result if passed
+     *
+     * @param string $result A SOAP result
+     * @return void
+     */
+    public function showError($result = null)
+    {
+        $lastRequest = $this->client->__getLastRequest() ? $this->client->__getLastRequest() : "";
+        $this->log($lastRequest);
+
+        if (Configure::read('debug') === true) {
+            if ($this->error) {
+                trigger_error('<span style="color:Red;text-align:left"><b>SOAP Error:</b> ' . $this->error . '</span>', E_USER_WARNING);
+            }
+            if (!empty($result)) {
+                echo sprintf("<p><b>Result:</b> %s </p>", $result);
+            }
+        }
     }
 }
