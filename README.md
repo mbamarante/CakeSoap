@@ -1,7 +1,7 @@
 # CakeSoap
 
 ## Requirements
-* CakePHP 3.x
+* CakePHP 4.x
 
 ## Installation
 
