@@ -40,10 +40,10 @@ class SoapClient extends Client
     public function __doRequest($request, $location, $action, $version, $oneWay = 0)
     {
         if (Configure::read('debug') === true) {
-            $this->log($request, 'debug');
-            $this->log($location, 'debug');
-            $this->log($action, 'debug');
-            $this->log($version, 'debug');
+            $this->log($request);
+            $this->log($location);
+            $this->log($action);
+            $this->log($version);
         }
         return parent::__doRequest($request, $location, $action, $version, $oneWay);
     }
@@ -61,12 +61,13 @@ class SoapClient extends Client
     public function __soapCall($functionName, $arguments, $options = null, $inputHeaders = null, &$outputHeaders = null)
     {
         if (Configure::read('debug') === true) {
-            $this->log($functionName, 'debug');
-            $this->log($arguments, 'debug');
-            $this->log($options, 'debug');
-            $this->log($inputHeaders, 'debug');
-            $this->log($outputHeaders, 'debug');
+            $this->log($functionName);
+            $this->log(json_encode($arguments));
+            $this->log(json_encode($options));
+            $this->log(json_encode($inputHeaders));
+            $this->log(json_encode($outputHeaders));
         }
+
         return parent::__soapCall($functionName, $arguments, $options, $inputHeaders, $outputHeaders);
     }
 }
