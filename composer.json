@@ -1,12 +1,12 @@
 {
-    "name": "queencitycodefactory/cakesoap",
+    "name": "mbamarante/cakesoap",
     "description": "Soap plugin for CakePHP 3.x",
     "type": "cakephp-plugin",
     "keywords":[
         "cakephp",
         "soap"
     ],
-    "homepage": "http://github.com/QueenCityCodeFactory/CakeSoap",
+    "homepage": "http://github.com/mbamarante/CakeSoap",
     "authors":[
         {
             "name":"jrble819",
@@ -16,8 +16,8 @@
     ],
     "license": "MIT",
     "support":{
-        "source":"https://github.com/QueenCityCodeFactory/CakeSoap",
-        "issues":"https://github.com/QueenCityCodeFactory/CakeSoap/issues"
+        "source":"https://github.com/mbamarante/CakeSoap",
+        "issues":"https://github.com/mbamarante/CakeSoap/issues"
     },
     "require": {
         "php": ">=5.5.9",
