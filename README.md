@@ -10,14 +10,14 @@ You can install this plugin into your CakePHP application using [composer](http:
 The recommended way to install composer packages is:
 
 ```
-composer require queencitycodefactory/cakesoap
+composer require mbamarante/cakesoap
 ```
 
-You can also add `"queencitycodefactory/cakesoap" : "dev-master"` to `require` section in your application's `composer.json`. Use for latest updates.
+You can also add `"mbamarante/cakesoap" : "dev-master"` to `require` section in your application's `composer.json`. Use for latest updates.
 
 -- or --
 
-You can also add `"queencitycodefactory/cakesoap" : "~3.2"` to `require` section in your application's `composer.json`. Stable Release.
+You can also add `"mbamarante/cakesoap" : "~3.2"` to `require` section in your application's `composer.json`. Stable Release.
 
 ## Usage
 
